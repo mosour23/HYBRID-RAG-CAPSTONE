@@ -1,0 +1,10 @@
+spacy
+numpy
+scikit-fuzzy
+faiss-cpu
+sentence-transformers
+transformers
+accelerate
+langchain
+pandas
+matplotlib
