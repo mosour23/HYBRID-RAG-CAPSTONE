@@ -33,6 +33,8 @@ class RAGPipeline:
         embeddings = self.embedder.encode(docs)
         embeddings = np.array(embeddings).astype('float32')
         self.index.add(embeddings)
+        
+        # The list automatically tracks the original chronological order based on the index
         self.documents.extend(docs)
         print(f"Total documents in index: {self.index.ntotal}")
 
@@ -45,15 +47,22 @@ class RAGPipeline:
         query_embedding = np.array(query_embedding).astype('float32')
         distances, indices = self.index.search(query_embedding, top_k)
 
+        # 2. Extract valid indices
+        valid_indices = [idx for idx in indices[0] if idx != -1 and idx < len(self.documents)]
+        
+        # 3. OP-RAG CORE LOGIC: Sort indices to preserve the original chronological order
+        sorted_indices = sorted(valid_indices)
+
+        # 4. Fetch the documents in their original order
         retrieved_docs = []
-        for idx in indices[0]:
-            if idx != -1 and idx < len(self.documents):
-                retrieved_docs.append(self.documents[idx])
+        for idx in sorted_indices:
+            retrieved_docs.append(self.documents[idx])
                 
+        # 5. Build the ordered context
         context = "\n".join([f"- {doc}" for doc in retrieved_docs])
         
-        # 2. Fast, direct generation via Llama-3
-        print("⚡ Generating fast factual response via Llama-3...")
+        # 6. Fast, direct generation via Llama-3
+        print("⚡ Generating fast factual response via Llama-3 (OP-RAG enabled)...")
         prompt = f"Use ONLY the following context to answer the query briefly.\n\nContext:\n{context}\n\nQuery: {query}\nAnswer:"
         
         response = self.client.chat.completions.create(

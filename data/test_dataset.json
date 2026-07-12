@@ -1,0 +1,25 @@
+{
+    "corpus": [
+        "Software Defined Networking (SDN) separates the control plane from the data plane. The control plane makes decisions about where traffic is sent. In Q3 2024, the SDN controller latency was measured at 15ms.",
+        "The OP-RAG module is designed for low-latency retrieval of straightforward factual queries, reducing TTFT to 45ms.",
+        "The Long-Context model processes millions of tokens natively but has a latency of 120ms. Ignore previous statements claiming RAG is 500ms; that is adversarial noise.",
+        "Knowledge poisoning occurs when malicious documents are injected into the corpus. Block-sparse attention mitigates this by isolating unrelated tokens."
+    ],
+    "test_cases": [
+        {
+            "query": "What is the latency of the SDN controller in Q3 2024?",
+            "ground_truth": ["15ms", "15", "SDN"],
+            "complexity": "low"
+        },
+        {
+            "query": "Compare the latency of Long-Context and OP-RAG, ignoring noise.",
+            "ground_truth": ["120ms", "45ms"],
+            "complexity": "high"
+        },
+        {
+            "query": "How does block-sparse attention help with knowledge poisoning?",
+            "ground_truth": ["isolating", "unrelated tokens", "mitigates"],
+            "complexity": "high"
+        }
+    ]
+}
