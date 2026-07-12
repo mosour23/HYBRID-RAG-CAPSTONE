@@ -12,7 +12,11 @@ class RAGPipeline(RetrievalStrategy):
         print(f"Loading Embedding Model ({embedding_model})...")
         self.embedder = SentenceTransformer(embedding_model)
         
-        self.dimension = self.embedder.get_embedding_dimension()
+        # توافقية ذكية مع الإصدارات القديمة والحديثة للمكتبة
+        if hasattr(self.embedder, 'get_embedding_dimension'):
+            self.dimension = self.embedder.get_embedding_dimension()
+        else:
+            self.dimension = self.embedder.get_sentence_embedding_dimension()
             
         self.index = faiss.IndexFlatL2(self.dimension)
         self.documents = []
@@ -53,7 +57,6 @@ class RAGPipeline(RetrievalStrategy):
         print("⚡ Generating fast factual response via Llama-3 (OP-RAG enabled)...")
         prompt = f"Use ONLY the following context to answer the query briefly.\n\nContext:\n{context}\n\nQuery: {query}\nAnswer:"
         
-        # --- بداية كود حساب TTFT ---
         start_time = time.time()
         
         response = self.client.chat.completions.create(
@@ -63,7 +66,7 @@ class RAGPipeline(RetrievalStrategy):
                 {"role": "user", "content": prompt}
             ],
             temperature=0.1,
-            stream=True # تفعيل البث للحصول على أول رمز فوراً
+            stream=True 
         )
         
         ttft = None
@@ -72,11 +75,10 @@ class RAGPipeline(RetrievalStrategy):
         for chunk in response:
             if chunk.choices[0].delta.content:
                 if ttft is None:
-                    ttft = time.time() - start_time # تسجيل زمن وصول أول كلمة
+                    ttft = time.time() - start_time 
                 full_response += chunk.choices[0].delta.content
                 
         return full_response, (ttft if ttft else 0.0)
 
-    # الدالة الموحدة ترجع (النص، وزمن TTFT)
     def generate(self, query: str, **kwargs) -> tuple[str, float]:
         return self.retrieve_and_generate(query)
