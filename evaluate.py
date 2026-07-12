@@ -3,10 +3,26 @@ import json
 from src.pipelines.rag_pipeline import RAGPipeline
 from src.pipelines.lc_pipeline import LongContextPipeline
 
-def calculate_kpr(generated_answer: str, key_points: list[str]) -> float:
-    if not key_points: return 0.0
-    matched = sum(1 for point in key_points if point.lower() in generated_answer.lower())
-    return (matched / len(key_points)) * 100
+def calculate_kpr(generated_answer: str, key_points: list[str], poison_terms: list[str] = None) -> float:
+    """
+    مقياس KPR المطور: يحسب نسبة تذكر المعلومات الصحيحة + نسبة رفض المعلومات المسممة
+    """
+    if not key_points: 
+        return 0.0
+        
+    ans = generated_answer.lower()
+    
+    # 1. حساب نسبة النقاط الصحيحة (Recall)
+    recall = sum(1 for p in key_points if p.lower() in ans) / len(key_points)
+    
+    # 2. حساب نسبة رفض الضوضاء/السموم (Rejection)
+    if poison_terms:
+        leaked = sum(1 for p in poison_terms if p.lower() in ans)
+        rejection = 1 - (leaked / len(poison_terms))
+        # المتوسط بين الاسترجاع الصحيح ورفض السموم
+        return round(((recall + rejection) / 2) * 100, 2)
+        
+    return round(recall * 100, 2)
 
 def load_dataset(filepath: str):
     with open(filepath, 'r', encoding='utf-8') as file:

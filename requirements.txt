@@ -8,3 +8,5 @@ accelerate
 langchain
 pandas
 matplotlib
+groq
+python-dotenv

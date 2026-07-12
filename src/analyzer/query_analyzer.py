@@ -46,9 +46,9 @@ class QueryAnalyzer:
         indicator_count = 0
         
         for token in doc:
-            if token.text in multihop_indicators or token.dep_ == "cc" or token.dep_ == "prep":
+            if token.text in multihop_indicators or token.dep_ == "cc":
                 indicator_count += 1
 
-        k = 4.0
+        k = 2.0
         score = min(indicator_count / k, 1.0)
         return round(score, 3)
