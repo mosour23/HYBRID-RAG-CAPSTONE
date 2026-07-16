@@ -10,10 +10,10 @@ def calculate_kpr(generated_answer: str, key_points: list[str], poison_terms: li
         
     ans = generated_answer.lower()
     
-    # 1. حساب نسبة النقاط الصحيحة (Recall)
+    # 1. Compute the correct-point recall rate
     recall = sum(1 for p in key_points if p.lower() in ans) / len(key_points)
     
-    # 2. حساب نسبة رفض الضوضاء/السموم (Rejection)
+    # 2. Compute the noise/toxin rejection rate
     if poison_terms:
         leaked = sum(1 for p in poison_terms if p.lower() in ans)
         rejection = 1 - (leaked / len(poison_terms))
@@ -30,7 +30,7 @@ def run_real_data_evaluation():
     print("📊 Starting AUTOMATED System Evaluation (Real Dataset)")
     print("="*60)
 
-    # استخدام Factory Pattern لإنشاء المسارات
+    # Use the Factory Pattern to instantiate the pipelines
     rag_pipeline = PipelineFactory.get_pipeline("OP-RAG")
     lc_pipeline = PipelineFactory.get_pipeline("Long-Context")
 
@@ -52,7 +52,7 @@ def run_real_data_evaluation():
         
         print(f"--- Test Case {i}: {query} ---")
         
-        # --- اختبار مسار RAG ---
+        # --- RAG pipeline test ---
         rag_ans, rag_ttft = rag_pipeline.generate(query)
         rag_kpr = calculate_kpr(rag_ans, ground_truth, poison_terms)
         
@@ -60,7 +60,7 @@ def run_real_data_evaluation():
         results["RAG"]["kpr"].append(rag_kpr)
         print(f"⚡ RAG -> TTFT: {rag_ttft:.3f}s | KPR: {rag_kpr}%")
 
-        # --- اختبار مسار LC ---
+        # --- LC pipeline test ---
         lc_ans, lc_ttft = lc_pipeline.generate(query, context=full_lc_context)
         lc_kpr = calculate_kpr(lc_ans, ground_truth, poison_terms)
         

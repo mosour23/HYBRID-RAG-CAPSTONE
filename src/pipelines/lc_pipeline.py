@@ -25,7 +25,7 @@ class LongContextPipeline(RetrievalStrategy):
         
         print("🧠 Analyzing logical connections across the full context via Llama-3...")
         
-        # --- بداية كود حساب TTFT ---
+        # --- Start of TTFT measurement code ---
         start_time = time.time()
         
         response = self.client.chat.completions.create(
@@ -35,7 +35,7 @@ class LongContextPipeline(RetrievalStrategy):
                 {"role": "user", "content": prompt}
             ],
             temperature=0.2,
-            stream=True # تفعيل البث
+            stream=True # Enable streaming
         )
         
         ttft = None

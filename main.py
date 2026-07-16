@@ -12,7 +12,7 @@ def run_hybrid_rag_system():
     
     print("\n[System Ready] All modules loaded successfully!\n")
 
-    # بيانات تجريبية
+    # Sample data
     rag_docs = ["The OP-RAG module reduces latency to 45ms."]
     
     rag_pipeline = PipelineFactory.get_pipeline("OP-RAG")
@@ -51,7 +51,7 @@ def run_hybrid_rag_system():
         
         print(f"\n  [Executing {decision} Pipeline...]")
         
-        # --- التعديل هنا: استقبال النتيجة والزمن معاً وطباعتهما ---
+        # --- Adjustment here: capture the result and TTFT together, then print both ---
         result, ttft = pipeline.generate(query, context=long_document)
         print(f"  ✅ Output:\n     {result}")
         print(f"  ⏱️ Time-To-First-Token (TTFT): {ttft:.4f} seconds")

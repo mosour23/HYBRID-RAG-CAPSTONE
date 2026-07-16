@@ -4,7 +4,7 @@ import os
 def generate_academic_dataset():
     print("Generating Academic Benchmark Dataset (CLADDER & HaluEval Subsets)...")
     
-    # 1. إنشاء نصوص ضخمة ومعقدة (Corpus)
+    # 1. Build large, complex text corpora (Corpus)
     corpus = [
         # --- Domain 1: Cloud & SDN (Networking) ---
         "Software Defined Networking (SDN) decouples the network control and forwarding functions. The OpenFlow protocol is foundational to this architecture. In a benchmark test conducted in 2023, the core OpenFlow controller achieved a baseline latency of 12ms under heavy load.",
@@ -22,7 +22,7 @@ def generate_academic_dataset():
         "The NIST organization announced in 2024 that organizations must transition away from standard RSA to Post-Quantum Cryptography (PQC) lattice-based algorithms to secure data against future quantum threats."
     ]
 
-    # 2. تصميم حالات الاختبار (Test Cases)
+    # 2. Design test cases (Test Cases)
     test_cases = [
         # --- Standard Factoid (Low Complexity) -> Should route to OP-RAG ---
         {
@@ -78,7 +78,7 @@ def generate_academic_dataset():
         "test_cases": test_cases
     }
 
-    # التأكد من وجود مجلد data
+    # Ensure the data directory exists
     os.makedirs('data', exist_ok=True)
     
     file_path = 'data/test_dataset.json'

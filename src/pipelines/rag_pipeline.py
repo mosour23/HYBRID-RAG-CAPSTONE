@@ -12,7 +12,7 @@ class RAGPipeline(RetrievalStrategy):
         print(f"Loading Embedding Model ({embedding_model})...")
         self.embedder = SentenceTransformer(embedding_model)
         
-        # توافقية ذكية مع الإصدارات القديمة والحديثة للمكتبة
+        # Smart compatibility with older and newer versions of the library
         if hasattr(self.embedder, 'get_embedding_dimension'):
             self.dimension = self.embedder.get_embedding_dimension()
         else:

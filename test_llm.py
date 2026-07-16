@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
-# 1. قراءة المفتاح السرّي من ملف .env
+# 1. Read the secret key from the .env file
 load_dotenv()
 
 api_key = os.getenv("GROQ_API_KEY")
@@ -13,7 +13,7 @@ else:
     print("🔌 Connecting to Groq Cloud (Llama-3.1-8B)...")
     client = Groq(api_key=api_key)
 
-    # 2. إرسال تحية للنموذج
+    # 2. Send a greeting to the model
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[
