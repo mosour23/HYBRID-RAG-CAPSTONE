@@ -1,3 +1,32 @@
+import sys
+import types
+import importlib
+import importlib.util
+
+# خدعة برمجية لتجاوز خطأ مكتبة imp في Python 3.12
+class MockImp:
+    @staticmethod
+    def find_module(name, path=None):
+        spec = importlib.util.find_spec(name, path)
+        if spec is None:
+            raise ImportError(f"No module named {name}")
+        return None, spec.origin, None
+    
+    @staticmethod
+    def load_module(name, file, pathname, description):
+        return importlib.import_module(name)
+
+sys.modules['imp'] = MockImp()
+sys.modules['imp'].new_module = types.ModuleType
+
+# -------------------------------------------------------------
+# هنا تبدأ استدعاءاتك الطبيعية (لا تمسح الكود القديم، فقط اجعله أسفل هذه الخدعة)
+import streamlit as st
+import time
+from src.router.fuzzy_controller import FuzzyController
+from src.pipelines.pipeline_factory import PipelineFactory
+# ... باقي كود الواجهة الذي أرسلته لك مسبقاً
+
 import streamlit as st
 import time
 
