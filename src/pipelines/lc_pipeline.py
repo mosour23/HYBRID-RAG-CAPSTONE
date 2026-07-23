@@ -1,7 +1,15 @@
 import os
 import time
-from dotenv import load_dotenv
-from groq import Groq
+try:
+    from dotenv import load_dotenv
+except Exception:
+    def load_dotenv():
+        print("Warning: python-dotenv not installed; skipping .env load.")
+try:
+    from groq import Groq
+except Exception:
+    Groq = None
+    print("Warning: groq package not installed; Groq client will be disabled.")
 from src.pipelines.base_strategy import RetrievalStrategy
 
 class LongContextPipeline(RetrievalStrategy): 
@@ -11,13 +19,16 @@ class LongContextPipeline(RetrievalStrategy):
         
         load_dotenv()
         api_key = os.getenv("GROQ_API_KEY")
-        if not api_key:
-            raise ValueError("❌ Error: GROQ_API_KEY not found in .env file.")
-        
-        self.client = Groq(api_key=api_key)
+        if not api_key or Groq is None:
+            print("Warning: GROQ_API_KEY not found or groq unavailable; Groq client disabled.")
+            self.client = None
+        else:
+            self.client = Groq(api_key=api_key)
 
     def process_full_context(self, query: str, context: str):
         print("\n" + "-"*40)
+        if self.client is None:
+            return ("Error: Groq client not configured. Set GROQ_API_KEY in the environment and install python-dotenv (pip install python-dotenv).", 0.0)
         print(f"🚀 Long-Context Pipeline Activated")
         
         clean_context = self._filter_adversarial_noise(context)

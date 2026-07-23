@@ -3,8 +3,17 @@ import time
 import numpy as np
 import faiss
 from sentence_transformers import SentenceTransformer
-from dotenv import load_dotenv
-from groq import Groq
+try:
+    from dotenv import load_dotenv
+except Exception:
+    # If python-dotenv is not installed, provide a no-op and warn.
+    def load_dotenv():
+        print("Warning: python-dotenv not installed; skipping .env load.")
+try:
+    from groq import Groq
+except Exception:
+    Groq = None
+    print("Warning: groq package not installed; Groq client will be disabled.")
 from src.pipelines.base_strategy import RetrievalStrategy
 
 class RAGPipeline(RetrievalStrategy): 
@@ -23,9 +32,13 @@ class RAGPipeline(RetrievalStrategy):
         
         load_dotenv()
         api_key = os.getenv("GROQ_API_KEY")
-        if not api_key:
-            raise ValueError("❌ Error: GROQ_API_KEY not found in .env file.")
-        self.client = Groq(api_key=api_key)
+        if not api_key or Groq is None:
+            # Do not raise at import time; allow the app to start and provide
+            # a helpful message when the pipeline is invoked.
+            print("Warning: GROQ_API_KEY not found or groq unavailable; Groq client disabled.")
+            self.client = None
+        else:
+            self.client = Groq(api_key=api_key)
         self.llm_model = llm_model
 
     def ingest_documents(self, docs: list[str]):
@@ -40,6 +53,9 @@ class RAGPipeline(RetrievalStrategy):
     def retrieve_and_generate(self, query: str, top_k: int = 2):
         if self.index.ntotal == 0:
             return "Error: The database is empty.", 0.0
+
+        if self.client is None:
+            return ("Error: Groq client not configured. Set GROQ_API_KEY in the environment and install python-dotenv (pip install python-dotenv).", 0.0)
 
         query_embedding = self.embedder.encode([query])
         query_embedding = np.array(query_embedding).astype('float32')
